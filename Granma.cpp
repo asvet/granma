@@ -1,6 +1,3 @@
-﻿// Granma.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,6 +6,7 @@ using namespace std;
 
 
 vector<string> DICT;
+vector<string> M;
 constexpr char ABET[] =	
 {
 	'A', 'B', 'C','D', 'E', 'F', 'G', 'H','I',
@@ -108,7 +106,7 @@ int sort_byalpha(const int pos)
 	return j + 1;
 }
 
-void sort_aorder(const int pos)
+void sort_aorder(const int pos)		//reduce in 1 function
 {
 	string key = DICT[pos];
 	string s(sort(key)); // in a order
@@ -121,7 +119,7 @@ void sort_aorder(const int pos)
 	DICT[j + 1] = key;
 }
 
-void read_input()
+void read_dict()
 {
 	string s;
 	cin >> s;
@@ -136,11 +134,23 @@ void read_input()
 	}
 }
 
-int main()
+void read_m()
 {
-	read_input();
-	for (auto el : DICT) { cout << el << endl; }
-	
-	
+	string s;
+	cin >> s;
+	while (s != "*")
+	{
+		M.push_back(s);
+		cin >> s;
+	}
 }
 
+int main()
+{
+	read_dict();
+	read_m();
+	for (auto el : DICT) { cout << el << endl; }
+	for (auto el : M) { cout << el << endl; }
+	  
+	
+}
