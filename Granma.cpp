@@ -84,7 +84,7 @@ bool more_diff(const string a, const string b)
 	else return 0;
 }
 
-void sort(const int pos, int& val, bool b)
+void sort(const int pos)
 {
 	string key = DICT[pos];
 	int j = pos - 1;
@@ -94,7 +94,20 @@ void sort(const int pos, int& val, bool b)
 		j--;
 	}
 	DICT[j + 1] = key;
-	val = j+1;
+	key = DICT[j+1];
+	while ((j > -1) && (key.size() == DICT[j].size()) && b)	// another bool function
+	{
+		DICT[j + 1] = DICT[j];
+		j--;
+	}
+	DICT[j + 1] = key;
+	key = DICT[j+1];
+	while ((j > -1) && (key.size() == DICT[j].size()) && b)	// another bool function
+	{
+		DICT[j + 1] = DICT[j];
+		j--;
+	}
+	DICT[j + 1] = key;
 }
 
 void read_dict()
@@ -106,9 +119,7 @@ void read_dict()
 		int pos1, pos2, pos3;
 		DICT.push_back(s); 
 		int pos = sort_bysize(); // sort by size and return index
-		sort(pos, pos1,more_diff(key, DICT[j]));
-		sort(pos2, pos3, not_aorder(sort(DICT[j]),s));
-		sort(pos3, not_aorder(DICT[j], s)); 
+		sort(pos);
 		cin >> s;
 	}
 }
