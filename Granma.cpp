@@ -21,6 +21,7 @@ int find_pos(const char c)
 {
 	for (size_t i = 0; i < 26; i++) { if (c == ABET[i]) return i; }
 }
+
 string sort(string s)
 {
 	string str(s);
@@ -40,7 +41,7 @@ string sort(string s)
 
 bool not_aorder(const string a, const string b)
 {
-	for (size_t i = 0; i < a.size(); i++)	//here we are sure that the sizes are correct by the insertion theorem
+	for (size_t i = 0; i < a.size(); i++)	//here we are sure that the sizes are correct by the insertion propriety
 	{
 		if (a[i] != b[i])
 		{
@@ -82,44 +83,18 @@ bool more_diff(const string a, const string b)
 	if (count_a > count_b) return 1;
 	else return 0;
 }
-int sort_byfreq(const int pos)
-{
-	string key = DICT[pos];
-	int j = pos - 1;
-	while ((j > -1) && (key.size() == DICT[j].size()) && more_diff(key, DICT[j]))
-	{
-		DICT[j + 1] = DICT[j];
-		j--;
-	}
-	DICT[j + 1] = key;
-	return j + 1;
-}
 
-int sort_byalpha(const int pos)
+void sort(const int pos, int& val, bool b)
 {
 	string key = DICT[pos];
-	string s(sort(key)); // in a order
 	int j = pos - 1;
-	while ((j > -1) && (s.size() == DICT[j].size()) && not_aorder(sort(DICT[j]),s))
+	while ((j > -1) && (key.size() == DICT[j].size()) && b)	// another bool function
 	{
 		DICT[j + 1] = DICT[j];
 		j--;
 	}
 	DICT[j + 1] = key;
-	return j + 1;
-}
-
-void sort_aorder(const int pos)		//reduce in 1 function
-{
-	string key = DICT[pos];
-	string s(sort(key)); // in a order
-	int j = pos - 1;
-	while ((j > -1) && (s.size() == DICT[j].size()) && not_aorder(DICT[j], s))
-	{
-		DICT[j + 1] = DICT[j];
-		j--;
-	}
-	DICT[j + 1] = key;
+	val = j+1;
 }
 
 void read_dict()
@@ -128,11 +103,12 @@ void read_dict()
 	cin >> s;
 	while (s != ".")
 	{
+		int pos1, pos2, pos3;
 		DICT.push_back(s); 
 		int pos = sort_bysize(); // sort by size and return index
-		int pos2 = sort_byfreq(pos);
-		int pos3 = sort_byalpha(pos2);
-		sort_aorder(pos3);
+		sort(pos, pos1,more_diff(key, DICT[j]));
+		sort(pos2, pos3, not_aorder(sort(DICT[j]),s));
+		sort(pos3, not_aorder(DICT[j], s)); 
 		cin >> s;
 	}
 }
