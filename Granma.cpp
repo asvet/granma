@@ -88,21 +88,21 @@ void sort(const int pos)
 {
 	string key = DICT[pos];
 	int j = pos - 1;
-	while ((j > -1) && (key.size() == DICT[j].size()) && b)	// another bool function
+	while ((j > -1) && (key.size() == DICT[j].size()) && more_diff(key, DICT[j]))	// another bool function
 	{
 		DICT[j + 1] = DICT[j];
 		j--;
 	}
 	DICT[j + 1] = key;
 	key = DICT[j+1];
-	while ((j > -1) && (key.size() == DICT[j].size()) && b)	// another bool function
+	while ((j > -1) && (key.size() == DICT[j].size()) && not_aorder(sort(DICT[j]),s))	// another bool function
 	{
 		DICT[j + 1] = DICT[j];
 		j--;
 	}
 	DICT[j + 1] = key;
 	key = DICT[j+1];
-	while ((j > -1) && (key.size() == DICT[j].size()) && b)	// another bool function
+	while ((j > -1) && (key.size() == DICT[j].size()) && not_aorder(DICT[j], s))	// another bool function
 	{
 		DICT[j + 1] = DICT[j];
 		j--;
