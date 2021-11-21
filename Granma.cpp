@@ -7,6 +7,7 @@ struct def
 	string word;
 	string alpha;
 };
+//blabla kaljsbdjhb
 
 struct anag
 {
