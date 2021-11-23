@@ -1,24 +1,8 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <vector>
+
 using namespace std;
-
-constexpr char ABET[] =
-{
-	'A', 'B', 'C', 'D', 'E', 'F',
-
-
-'G', 'H', 'I', 'J', 'K', 'L',
-
-
-'M', 'N', 'O', 'P', 'Q', 'R',
-
-
-'S', 'T', 'U', 'V', 'W', 'X',
-
-
-'Y',  'Z'
-};
 
 struct def
 {
@@ -32,14 +16,6 @@ struct anag
 	string agram;
 };
 
-vector<def> DICT;
-
-int find_pos(const char c)
-{
-	for (size_t i = 0; i < 26; i++) { if (c == ABET[i]) return i; }
-}
-
-
 string sort(string s)
 {
 	string str(s);
@@ -47,7 +23,7 @@ string sort(string s)
 	{
 		char key(s[i]);
 		int j = i - 1;
-		while ((j > -1) && (find_pos(key) < find_pos(s[j])))
+		while ((j > -1) && (key < s[j]))
 		{
 			s[j + 1] = s[j];
 			j--;
@@ -57,85 +33,122 @@ string sort(string s)
 	return s;
 }
 
-int sort_bysize()
+int sort_bysize(vector<def>& dict)
 {
-	def key = DICT[DICT.size() - 1]; // last added
-	int j = DICT.size() - 2;
-	while ((j > -1) && (key.word.size() < DICT[j].word.size()))
+	def key = dict[dict.size() - 1]; // last added
+	int j = dict.size() - 2;
+	while ((j > -1) && (key.word.size() < dict[j].word.size()))
 	{
-		DICT[j + 1] = DICT[j];
+		dict[j + 1] = dict[j];
 		j--;
 	}
-	DICT[j + 1] = key;
+	dict[j + 1] = key;
 	return j + 1;
 }
+
 bool more_diff(const string a, const string b)
 {
 	string v(a), w(b);
-	sort(v);
-	sort(w);
-	int count_a(0), count_b(0);
+	v = sort(v);
+	w = sort(w);
+	int count_a(1), count_b(1);
 	for (size_t i = 0; i < a.size() - 1; i++)
 	{
-		if (v[i + 1] == v[i]) count_a++;
-		if (w[i + 1] == w[i]) count_b++;
+		if (v[i + 1] != v[i]) count_a++;
+		if (w[i + 1] != w[i]) count_b++;
 	}
-	if (count_a > count_b) return 1;
+	if (count_a < count_b) return 1;
 	else return 0;
 }
-bool cond(def key, int j, int i)
+
+bool cond(def key, int j, int i, vector<def>& dict)
 {
 	switch (i)
 	{
-	case 1: return more_diff(key.word, DICT[j].word); break;
-	case 2: return DICT[j].alpha > key.word; break;
-	case 3: return  DICT[j].word> key.word; break;
+	case 1: return more_diff(key.word, dict[j].word); break;
+	case 2: return dict[j].alpha > key.word; break;
+	case 3: return  dict[j].word > key.word; break;
 	}
 }
 
-void sort(const int pos, int& p,int i)
+void sort(vector<def>& dict, const int pos, int& p, int i)
 {
-	def key = DICT[pos];
+	def key = dict[pos];
 	int j = pos - 1;
-	while ((j > -1) && (key.word.size() == DICT[j].word.size()) && cond(key,j,i))
+	while ((j > -1) && (key.word.size() == dict[j].word.size()) && cond(key, j, i, dict))
 	{
-		DICT[j + 1] = DICT[j];
+		dict[j + 1] = dict[j];
 		j--;
 	}
-	DICT[j + 1] = key;
+	dict[j + 1] = key;
 	p = j + 1;
 }
-void read_dict()
+
+void check_lowercase(string& word)
+{
+	for (size_t i = 0; i < word.size(); i++)
+	{
+		if (word[i] < 65 || word[i]> 90)
+		{
+			cout << "lowercase error";
+			exit(0);
+		}
+	}
+}
+
+void check_double(int& index, vector<def>& dict)		//check done after sorting.
+{
+	if (index > 0)
+	{
+		if (dict[index].word == dict[index - 1].word)
+		{
+			cout << "dictionnary repetition error " << endl;
+			exit(0);
+		}
+	}
+}
+
+void read_dict(vector<def>& dict)
 {
 	string s;
-	cin >> s;
+	cin >> s;	//add empty dico check
 	while (s != ".")
 	{
+		check_lowercase(s);
 		int pos1, pos2;
 		def w;
 		w.word = s;
 		w.alpha = sort(s);
-		DICT.push_back(w);
-		int pos = sort_bysize(); // sort by size and return index
-		sort(pos,pos1,1);
-		sort(pos1, pos2, 2);
-		sort(pos2, pos2, 3);
+		dict.push_back(w);
+		int pos = sort_bysize(dict); // sort by size and return index
+		sort(dict, pos, pos1, 1);
+		sort(dict, pos1, pos2, 2);
+		sort(dict, pos2, pos2, 3);
+		check_double(pos2, dict);
 		cin >> s;
 	}
+	if (dict.size() == 0)
+	{
+		cout << "empty dico error" << endl;
+		exit(0);
+	}
 }
-string read_m()
+
+string read_mline(bool& star)
 {
 	string message("");
 	string s;
 	cin >> s;
-	while (s != "*")
+	while ((s != ".") && (s!= "*"))
 	{
+		check_lowercase(s);
 		message += s;
 		cin >> s;
 	}
-	cout << message << endl;
+	if (s == "*") star = 1;
 	return message;
 }
+
 bool message_contient_mot(const string alpha, const string alpha_m)
 {
 	int j(0);
@@ -143,36 +156,42 @@ bool message_contient_mot(const string alpha, const string alpha_m)
 	{
 		if (alpha[j] == alpha_m[i])
 		{
-			if (j == alpha.size()-1) return 1;
+			if (j == alpha.size() - 1) return 1;
 			j++;
 		}
 	}
 	return 0;
 }
+
 void move_back(vector<def>& message, int pos)
 {
 	def key = message[pos];
-	for (size_t i = pos; i < message.size()-1; i++)
+	for (size_t i = pos; i < message.size() - 1; i++)
 	{
 		message[i] = message[i + 1];
 	}
-	message[message.size()-1] = key;
+	message[message.size() - 1] = key;
 }
+
 string message_soustraire_mot(string message, string alpha)
 {
 	int j(0);
 	string aux("");
 	for (size_t i = 0; i < message.size(); i++)
 	{
-		if (j >= alpha.size()) break;
-		if (message[i] != alpha[j])
+		if (j < alpha.size())
 		{
-			aux += message[i];
+			if (message[i] != alpha[j])
+			{
+				aux += message[i];
+			}
+			else j++;
 		}
-		else j++;
+		else aux += message[i];
 	}
 	return aux;
 }
+
 vector<def> enlever_mot(vector<def> vec, int pos)
 {
 	vector<def> v(vec);
@@ -184,28 +203,37 @@ vector<def> enlever_mot(vector<def> vec, int pos)
 void display(vector<string> v)
 {
 	for (auto el : v) { cout << el << endl; }
+	cout << endl;
 }
-bool rech_anagramme( vector<def> dico, string alpha_m, vector<string>& anagram)
+
+vector<string> ajouter(vector<string> anagramme, string mot)
 {
-	int dsize(DICT.size());
+	vector<string> aux(anagramme);
+	aux.push_back(mot);
+	return aux;
+}
+
+bool rech_anagramme(vector<def> dico, string alpha_m, vector<string> anagram)
+{
+	int dsize(dico.size());
 	if (dsize == 0) return 0;
 	bool success(0);
-	string alpha_m_next;
 	for (size_t i = 0; i < dsize; i++)
 	{
-		if (message_contient_mot(DICT[i].alpha, alpha_m))
+		if (message_contient_mot(dico[i].alpha, alpha_m))
 		{
-			anagram.push_back(DICT[i].alpha);
+			vector<string> a_next = ajouter(anagram, dico[i].word);
+			string alpha_m_next;
 			alpha_m_next = message_soustraire_mot(alpha_m, dico[i].alpha);
 			if (alpha_m_next.size() == 0)
 			{
-				display(anagram);
+				display(a_next);
 				success = true;
 			}
 			else
 			{
 				vector<def> dico_next(enlever_mot(dico, i));
-				if (rech_anagramme(dico_next, alpha_m, anagram) == 1) success = 1;
+				if (rech_anagramme(dico_next, alpha_m_next, a_next) == 1) success = 1;
 			}
 		}
 	}
@@ -214,28 +242,21 @@ bool rech_anagramme( vector<def> dico, string alpha_m, vector<string>& anagram)
 
 int main()
 {
-
 	vector<def> DICT;
-	read_dict();	//creates the vector of strings
-	for (auto el : DICT)
+	read_dict(DICT);
+	for (size_t i = 0; i < DICT.size(); i++)
 	{
-		cout << el.word << endl;
-
+		cout << DICT[i].word << endl;
 	}
-	cout << "---DICTIONNARY SORTED---" << endl;
-	string message(read_m());//creates a string which is the message
-	//sort(message);	// gets alpha value of message
-	string alpha_m = sort(message);
-	vector<string> anagram;
-	rech_anagramme(DICT, alpha_m, anagram);
-	//string s = sort("BLABLACAR");
-	//cout << s << endl;
-	//string s2 = sort("BLACAR");
-	//cout << s2 << endl;
-	//cout << message_contient_mot(s2, s);
-	//cout << message_soustraire_mot(s, s2);//string A - string B conserving the order.
-	
-	
-
+	bool star(0);
+	while (!star)
+	{
+		string message(read_mline(star));
+		string alpha_m = sort(message);
+		vector<string> anagram;
+		if (rech_anagramme(DICT, alpha_m, anagram)) cout << "---ANAGRAMS FOUND---" << endl;
+		else cout << "fail";
+		cout << endl;
+	}
 
 }
